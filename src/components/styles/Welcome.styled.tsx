@@ -8,9 +8,21 @@ export const HeroContainer = styled.div`
     margin-bottom: 1.5rem;
   }
 
-  div {
-    @media (min-width: 1024px) {
-      flex-basis: 50%;
+  > .info-section {
+    flex: 1 1 25rem;
+    min-width: 0;
+  }
+
+  > .illu-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 19rem;
+  }
+
+  @media (max-width: 550px) {
+    > .illu-section {
+      display: none;
     }
   }
 `;
@@ -20,27 +32,20 @@ export const PreName = styled.pre`
   margin-bottom: 1.5rem;
 
   @media (max-width: 550px) {
-    display: none;
-  }
-`;
-
-export const PreWrapper = styled.div`
-  text-align: center;
-`;
-
-export const PreNameMobile = styled.pre`
-  margin-top: 0.5rem;
-  margin-bottom: 1.5rem;
-
-  @media (min-width: 550px) {
-    display: none;
+    text-align: center;
   }
 `;
 
 export const PreImg = styled.pre`
-  @media (max-width: 550px) {
-    display: none;
-  }
+  margin: 0.75rem 0;
+`;
+
+export const TennisPortrait = styled.pre`
+  flex-shrink: 0;
+  font-size: 12px;
+  line-height: 1;
+  transform: translateX(-2rem);
+  user-select: none;
 `;
 
 export const Seperator = styled.div`
@@ -50,16 +55,4 @@ export const Seperator = styled.div`
 
 export const Cmd = styled.span`
   color: ${({ theme }) => theme.colors?.primary};
-`;
-
-export const Link = styled.a`
-  color: ${({ theme }) => theme.colors?.secondary};
-  text-decoration: none;
-  line-height: 1.5rem;
-  white-space: nowrap;
-  border-bottom: 2px dashed ${({ theme }) => theme.colors?.secondary};
-
-  &:hover {
-    border-bottom-style: solid;
-  }
 `;

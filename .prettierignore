@@ -9,3 +9,6 @@
 !package.json
 !.prettierrc
 !.eslintrc.json
+
+# Preserve the vendored upstream JavaScript style.
+/src/vendor/dino/**/*.js

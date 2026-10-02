@@ -1,22 +1,28 @@
-import {
-  AboutWrapper,
-  HighlightAlt,
-  HighlightSpan,
-} from "../styles/About.styled";
+import { AboutWrapper, HighlightSpan } from "../styles/About.styled";
+import { profile } from "../../data/profile";
+import { Link } from "../styles/Link.styled";
 
 const About: React.FC = () => {
   return (
     <AboutWrapper data-testid="about">
       <p>
-        Hi, my name is <HighlightSpan>Sat Naing</HighlightSpan>!
+        Hello! I am{" "}
+        <HighlightSpan>
+          {profile.name} ({profile.chineseName})
+        </HighlightSpan>
+        .
       </p>
       <p>
-        I'm <HighlightAlt>a full-stack developer</HighlightAlt> based in Yangon,
-        Myanmar.
+        I am a <HighlightSpan>{profile.role}</HighlightSpan> at{" "}
+        {profile.institution}'s {profile.department}, affiliated with the{" "}
+        <Link href={profile.lab.url}>{profile.lab.name}</Link>.
       </p>
       <p>
-        I am passionate about writing codes and <br />
-        developing web applications to solve real-life challenges.
+        I am advised by Prof.{" "}
+        <Link href={profile.advisor.url}>{profile.advisor.name}</Link>. My
+        research interests lie in{" "}
+        <HighlightSpan>{profile.research.field}</HighlightSpan>, with a current
+        focus on <HighlightSpan>{profile.research.focus}</HighlightSpan>.
       </p>
     </AboutWrapper>
   );

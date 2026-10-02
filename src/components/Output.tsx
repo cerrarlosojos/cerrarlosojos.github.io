@@ -1,33 +1,30 @@
 import About from "./commands/About";
-import Clear from "./commands/Clear";
+import FileReader from "./FileReader";
 import Echo from "./commands/Echo";
 import Education from "./commands/Education";
-import Email from "./commands/Email";
 import GeneralOutput from "./commands/GeneralOutput";
-import Gui from "./commands/Gui";
 import Help from "./commands/Help";
 import Welcome from "./commands/Welcome";
-import History from "./commands/History";
+import Ls from "./commands/Ls";
 import Projects from "./commands/Projects";
 import Socials from "./commands/Socials";
 import Themes from "./commands/Themes";
+import { CommandName, findCommand } from "../data/commands";
 import { OutputContainer, UsageDiv } from "./styles/Output.styled";
-import { termContext } from "./Terminal";
+import { termContext } from "./TerminalContext";
 import { useContext } from "react";
 
 type Props = {
   index: number;
-  cmd: string;
+  cmd: CommandName;
 };
 
 const Output: React.FC<Props> = ({ index, cmd }) => {
-  const { arg } = useContext(termContext);
-
-  const specialCmds = ["projects", "socials", "themes", "echo"];
+  const { arg, directory, commandError } = useContext(termContext);
 
   // return 'Usage: <cmd>' if command arg is not valid
   // eg: about tt
-  if (!specialCmds.includes(cmd) && arg.length > 0)
+  if (!findCommand(cmd)?.acceptsArguments && arg.length > 0)
     return <UsageDiv data-testid="usage-output">Usage: {cmd}</UsageDiv>;
 
   return (
@@ -35,15 +32,18 @@ const Output: React.FC<Props> = ({ index, cmd }) => {
       {
         {
           about: <About />,
-          clear: <Clear />,
+          cat: <FileReader command="cat" />,
+          cd: commandError ? (
+            <UsageDiv data-testid="cd-invalid-arg">{commandError}</UsageDiv>
+          ) : null,
+          clear: null,
           echo: <Echo />,
           education: <Education />,
-          email: <Email />,
-          gui: <Gui />,
+          glow: <FileReader command="glow" />,
           help: <Help />,
-          history: <History />,
+          ls: <Ls />,
           projects: <Projects />,
-          pwd: <GeneralOutput>/home/satnaing</GeneralOutput>,
+          pwd: <GeneralOutput>{directory}</GeneralOutput>,
           socials: <Socials />,
           themes: <Themes />,
           welcome: <Welcome />,

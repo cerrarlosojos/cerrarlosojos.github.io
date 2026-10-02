@@ -1,80 +1,67 @@
 import {
   Cmd,
   HeroContainer,
-  Link,
   PreImg,
   PreName,
-  PreNameMobile,
-  PreWrapper,
   Seperator,
+  TennisPortrait,
 } from "../styles/Welcome.styled";
+import { profile } from "../../data/profile";
+import { tennisAscii } from "../../data/tennisAscii";
+
+const nameBanner = `
+  +---------------------------+
+  |     CERRAR LOS OJOS.      |
+  +---------------------------+
+`;
+
+// Aspinall & Hofmann, ATTAPL, Chapter 2, Section 2.7, p. 71.
+// https://homepages.inf.ed.ac.uk/da/papers/attapl/
+const lambdaCube = `    Fω-------------CC
+    /|             /|
+   / |            / |
+  /  |           /  |
+ F--------------·   |
+ |   |          |   |
+ |   ·--------- | --·
+ |  /           |  /
+ | /            | /
+ |/             |/
+λ→-------------λP`;
 
 const Welcome: React.FC = () => {
   return (
     <HeroContainer data-testid="welcome">
       <div className="info-section">
-        <PreName>
-          {`        
-    _____       __     _   __      _            
-   / ___/____ _/ /_   / | / /___ _(_)___  ____ _
-   \\__ \\/ __ \`/ __/  /  |/ / __ \`/ / __  / __ \`/
-  ___/ / /_/ / /_   / /|  / /_/ / / / / / /_/ / 
- /____/\\__,_/\\___/ /_/ |_/\\__,_/_/_/ /_/\\__, /  
-                                       /____/   
-          `}
-        </PreName>
-        <PreWrapper>
-          <PreNameMobile>
-            {`
-    ____     __          
-   / __/__ _/ /_         
-  _\\ \\/ _ \`/ __/         
- /___/\\_,_/\\__/          
-    _  __     _          
-   / |/ /__ _(_)__  ___ _
-  /    / _ \`/ / _ \\/ _ \`/
- /_/|_/\\_,_/_/_//_/\\_, / 
-                  /___/  
- 
-          `}
-          </PreNameMobile>
-        </PreWrapper>
-        <div>Welcome to my terminal portfolio. (Version 1.3.1)</div>
+        <PreName>{nameBanner}</PreName>
+        <div>
+          Welcome to {profile.name} ({profile.chineseName})'s homepage.
+        </div>
         <Seperator>----</Seperator>
         <div>
-          This project's source code can be found in this project's{" "}
-          <Link href="https://github.com/satnaing/terminal-portfolio">
-            GitHub repo
-          </Link>
-          .
+          {profile.role} · {profile.institution}
         </div>
+        <div>
+          Research: {profile.research.field} · {profile.research.focus}
+        </div>
+        <PreImg
+          role="img"
+          aria-label="Lambda cube from ATTAPL, Chapter 2: Dependent Types"
+        >
+          {lambdaCube}
+        </PreImg>
         <Seperator>----</Seperator>
         <div>
           For a list of available commands, type `<Cmd>help</Cmd>`.
         </div>
       </div>
       <div className="illu-section">
-        <PreImg>
-          {`
-                       ,##,,eew,
-                     ,##############C
-                  a###############@##
-                 7####^\`^"7W7^"@####
-                 @#@b\`         ^@#@^
-                  ##^,,,,   ,,,,^#^
-                 ,,@######"#######=
-                  .''555"\` '5555b|
-                  T"@  ,,,^,mg,@,*
-                     %p||\`~~'.#\`
-                      ^Wp  ,#T
-                     :b''@@b^}
-                  ,^     \` 'b 3-
-              .<\` 'p   ^v   #   b   *.
-            {      }   #"GpGb   [
-            C      3 * @#######Nl      \`
-           '            ^@##b     ($    !
-         `}
-        </PreImg>
+        <TennisPortrait
+          role="img"
+          aria-label="Letter silhouette of a tennis serve, with a player, racket, and tossed ball"
+        >
+          {tennisAscii}
+        </TennisPortrait>
       </div>
     </HeroContainer>
   );

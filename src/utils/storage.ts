@@ -1,12 +1,18 @@
-export const setToLS = (key: string, value: string) => {
-  // window.localStorage.setItem(key, JSON.stringify(value));
-  window.localStorage.setItem(key, value);
+// Browsers can deny storage or run out of quota; these settings are optional.
+export const setToLS = (key: string, value: string | null): boolean => {
+  try {
+    if (value === null) window.localStorage.removeItem(key);
+    else window.localStorage.setItem(key, value);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
-export const getFromLS = (key: string) => {
-  const value = window.localStorage.getItem(key);
-
-  if (value) {
-    return value;
+export const getFromLS = (key: string): string | null => {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
   }
 };

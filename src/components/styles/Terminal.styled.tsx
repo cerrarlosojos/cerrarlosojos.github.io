@@ -37,11 +37,14 @@ export const MobileBr = styled.br`
 export const Form = styled.form`
   @media (min-width: 550px) {
     display: flex;
+    align-items: baseline;
   }
 `;
 
 export const Input = styled.input`
   flex-grow: 1;
+  padding: 0;
+  font: inherit;
 
   @media (max-width: 550px) {
     min-width: 85%;

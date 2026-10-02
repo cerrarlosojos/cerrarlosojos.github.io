@@ -11,6 +11,12 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      // index.html links the personalized static manifest. Avoid a competing
+      // generated manifest with the package's template name.
+      manifest: false,
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,png,svg,ico,ogg,webmanifest}"],
+      },
     }),
   ],
   test: {

@@ -1,15 +1,11 @@
 import { useContext } from "react";
-import _ from "lodash";
 import { Wrapper } from "../styles/Output.styled";
-import { termContext } from "../Terminal";
+import { termContext } from "../TerminalContext";
 
 const Echo: React.FC = () => {
   const { arg } = useContext(termContext);
 
-  let outputStr = _.join(arg, " ");
-  outputStr = _.trim(outputStr, "'"); // remove trailing single quotes ''
-  outputStr = _.trim(outputStr, '"'); // remove trailing double quotes ""
-  outputStr = _.trim(outputStr, "`"); // remove trailing backtick ``
+  const outputStr = arg.join(" ").replace(/^(['"`])(.*)\1$/, "$2");
 
   return <Wrapper>{outputStr}</Wrapper>;
 };

@@ -1,37 +1,12 @@
 {
-  "name": "Terminal Portfolio by SN",
-  "short_name": "Terminal",
-  "description": "Sat Naing's terminal portfolio website coded with ReactJS.",
+  "name": "Houjin Chen (陈厚锦)",
+  "short_name": "Houjin Chen",
+  "description": "Houjin Chen (陈厚锦), a Ph.D. student at Peking University researching Programming Languages and Program Verification.",
   "start_url": "/",
   "icons": [
     {
-      "src": "/maskable-icons/maskable_icon_x48.png",
-      "sizes": "48x48",
-      "type": "image/png"
-    },
-    {
-      "src": "/maskable-icons/maskable_icon_x72.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "/maskable-icons/maskable_icon_x96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "/maskable-icons/maskable_icon_x128.png",
-      "sizes": "128x128",
-      "type": "image/png"
-    },
-    {
       "src": "/maskable-icons/maskable_icon_x192.png",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/maskable-icons/maskable_icon_x384.png",
-      "sizes": "384x384",
       "type": "image/png"
     },
     {

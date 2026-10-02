@@ -1,29 +1,42 @@
+import { Fragment } from "react";
 import {
-  Cmd,
-  CmdDesc,
-  CmdList,
-  HelpWrapper,
-  KeyContainer,
+  CommandDescription,
+  CommandGrid,
+  CommandName,
+  HelpPanel,
+  HelpSection,
+  PanelTitle,
+  SectionTitle,
 } from "../styles/Help.styled";
-import { commands } from "../Terminal";
-import { generateTabs } from "../../utils/funcs";
+import { commandGroups, commands } from "../../data/commands";
 
 const Help: React.FC = () => {
   return (
-    <HelpWrapper data-testid="help">
-      {commands.map(({ cmd, desc, tab }) => (
-        <CmdList key={cmd}>
-          <Cmd>{cmd}</Cmd>
-          {generateTabs(tab)}
-          <CmdDesc>- {desc}</CmdDesc>
-        </CmdList>
-      ))}
-      <KeyContainer>
-        <div>Tab or Ctrl + i&nbsp; =&gt; autocompletes the command</div>
-        <div>Up Arrow {generateTabs(5)} =&gt; go back to previous command</div>
-        <div>Ctrl + l {generateTabs(5)} =&gt; clear the terminal</div>
-      </KeyContainer>
-    </HelpWrapper>
+    <HelpPanel data-testid="help">
+      <PanelTitle>Commands</PanelTitle>
+      {commandGroups.map(group => {
+        const groupCommands = commands.filter(
+          command =>
+            command.group === group && !("hidden" in command && command.hidden)
+        );
+
+        if (groupCommands.length === 0) return null;
+
+        return (
+          <HelpSection key={group}>
+            <SectionTitle>{group}</SectionTitle>
+            <CommandGrid>
+              {groupCommands.map(({ cmd, desc }) => (
+                <Fragment key={cmd}>
+                  <CommandName>{cmd}</CommandName>
+                  <CommandDescription>{desc}</CommandDescription>
+                </Fragment>
+              ))}
+            </CommandGrid>
+          </HelpSection>
+        );
+      })}
+    </HelpPanel>
   );
 };
 

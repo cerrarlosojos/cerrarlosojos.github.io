@@ -1,3 +1,5 @@
+# Homepage
+
 | Command | Content |
 | --- | --- |
 | `about` | Biography, research interests, lab, and advisor |
@@ -15,3 +17,7 @@
 | `themes [set <theme-name>]` | Lists available themes or switches to the selected theme |
 | `welcome` | Welcome banner, profile, research interests, lambda cube, and tennis silhouette |
 | `whoami` | Displays `visitor` |
+
+## Template credit
+
+Based on [Sat Naing's Terminal Portfolio](https://github.com/satnaing/terminal-portfolio), built with React, TypeScript, Styled Components, and Vite. The original MIT license and copyright notice are preserved in `LICENSE`.

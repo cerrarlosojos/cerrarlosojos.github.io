@@ -5,11 +5,16 @@ import sprite2x from "../vendor/dino/images/default_200_percent/200-offline-spri
 import jumpSound from "../vendor/dino/audio/press.ogg";
 import hitSound from "../vendor/dino/audio/hit.ogg";
 import scoreSound from "../vendor/dino/audio/reached.ogg";
-import { recordDinoRun } from "./dinoMemory";
+import { memoryScoreThreshold, recordDinoRun } from "./dinoMemory";
 import { getFromLS, setToLS } from "../utils/storage";
 
 export type DinoSession = {
   destroy: () => void;
+};
+
+export type DinoRun = {
+  score: number;
+  endedAt: number;
 };
 
 const highScoreKey = "terminal-dino-high-score";
@@ -42,18 +47,33 @@ const readHighScore = () => {
 
 export const createDinoRunner = async (
   container: HTMLElement,
-  options: { color: string; signal: AbortSignal }
+  options: {
+    color: string;
+    signal: AbortSignal;
+    onRunEnd?: (run: DinoRun) => void;
+    onMemoryCueChange?: (visible: boolean) => void;
+  }
 ): Promise<DinoSession | null> => {
   const sprite = await loadSprite(options.color);
   if (options.signal.aborted) return null;
 
+  let memoryCueVisible = false;
   const runner = new Runner(container, undefined, {
     sprite,
     sounds: { BUTTON_PRESS: jumpSound, HIT: hitSound, SCORE: scoreSound },
     highScore: readHighScore(),
+    onScoreChange: score => {
+      const visible = score > memoryScoreThreshold;
+      if (visible !== memoryCueVisible) {
+        memoryCueVisible = visible;
+        options.onMemoryCueChange?.(visible);
+      }
+    },
     onGameOver: (highScore, score) => {
-      void recordDinoRun(score);
+      const endedAt = Date.now();
+      void recordDinoRun(score, endedAt);
       setToLS(highScoreKey, String(highScore));
+      options.onRunEnd?.({ score, endedAt });
     },
   });
 

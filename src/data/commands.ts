@@ -58,7 +58,7 @@ export const commands = [
     desc: "list directories and files",
     group: "Navigation",
     acceptsArguments: true,
-    completion: "directory",
+    completion: "file",
   },
   {
     cmd: "projects",
@@ -75,6 +75,7 @@ export const commands = [
     desc: "GitHub, email, and publications",
     group: "Info",
   },
+  { cmd: "teaching", desc: "teaching assistant experience", group: "Info" },
   {
     cmd: "themes",
     desc: "check available themes",

@@ -19,6 +19,8 @@ Local adaptations in `resources/dino_game/offline.js`:
   pending audio fetches and audio contexts when exiting.
 - Report both the raw high score and the completed run's visible score through
   the adapter; no Chromium globals.
+- Report score changes, including the reset on restart, so the adapter can
+  reveal a small black cube after the current run passes the memory threshold.
 - Detect Safari/iPad touch devices in `constants.js`.
 
 `src/games/createDinoRunner.ts` loads and tints sprites for the active homepage

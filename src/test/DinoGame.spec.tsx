@@ -104,6 +104,66 @@ describe("Hidden dinosaur game", () => {
     expect(screen.getByTestId("latest-output")).toHaveTextContent("~/.Games/");
   });
 
+  it("keeps the cube through game over and removes it for a new run or session", async () => {
+    command("./.Games/dino");
+    await waitFor(() => expect(createDinoRunner).toHaveBeenCalledTimes(1));
+    const options = vi.mocked(createDinoRunner).mock.calls[0][1];
+    const cube = () =>
+      screen.queryByRole("img", { name: "A small black cube" });
+    expect(cube()).not.toBeInTheDocument();
+    act(() => options.onMemoryCueChange?.(true));
+    expect(cube()).toBeInTheDocument();
+    act(() => options.onRunEnd?.({ score: 573, endedAt: Date.now() }));
+    expect(cube()).toBeInTheDocument();
+    act(() => options.onMemoryCueChange?.(false));
+    expect(cube()).not.toBeInTheDocument();
+    act(() => options.onMemoryCueChange?.(true));
+    fireEvent.keyDown(screen.getByRole("application"), { key: "Escape" });
+    expect(cube()).not.toBeInTheDocument();
+    command("./.Games/dino");
+    await waitFor(() => expect(createDinoRunner).toHaveBeenCalledTimes(2));
+    expect(cube()).not.toBeInTheDocument();
+  });
+
+  it.each(["Escape", "button"])(
+    "keeps the last completed score and time after exiting via %s",
+    async exit => {
+      command("./.Games/dino");
+      await waitFor(() => expect(createDinoRunner).toHaveBeenCalledTimes(1));
+      const onRunEnd = vi.mocked(createDinoRunner).mock.calls[0][1].onRunEnd;
+      const endedAt = new Date("2026-10-03T12:34:56+08:00");
+      act(() => {
+        onRunEnd?.({ score: 900, endedAt: endedAt.getTime() - 60000 });
+        onRunEnd?.({ score: 573, endedAt: endedAt.getTime() });
+      });
+      expect(screen.queryByTestId("dino-run-summary")).not.toBeInTheDocument();
+      if (exit === "Escape") {
+        fireEvent.keyDown(screen.getByRole("application"), { key: "Escape" });
+      } else {
+        await userEvent.click(
+          screen.getByRole("button", { name: "Exit [Esc]" })
+        );
+      }
+      const summary = screen.getByTestId("dino-run-summary");
+      expect(summary).toHaveTextContent("dino ended · score 00573");
+      expect(summary).not.toHaveTextContent("00900");
+      expect(summary.querySelector("time")).toHaveAttribute(
+        "datetime",
+        endedAt.toISOString()
+      );
+      command("ls Blog");
+      expect(summary).toBeInTheDocument();
+
+      // A new session exited before a crash does not invent or reuse a score.
+      command("./.Games/dino");
+      await waitFor(() => expect(createDinoRunner).toHaveBeenCalledTimes(2));
+      fireEvent.keyDown(screen.getByRole("application"), { key: "Escape" });
+      expect(screen.getAllByTestId("dino-run-summary")).toHaveLength(1);
+      command("clear");
+      expect(screen.queryByTestId("dino-run-summary")).not.toBeInTheDocument();
+    }
+  );
+
   it("disposes a session that finishes loading after the user has exited", async () => {
     let resolve: (session: DinoSession) => void = () => undefined;
     vi.mocked(createDinoRunner).mockImplementationOnce(
@@ -151,7 +211,7 @@ describe("Hidden dinosaur game", () => {
     command("ls -x");
     expect(
       within(screen.getByTestId("latest-output")).getByText(
-        "Usage: ls [-a] [directory]"
+        "Usage: ls [-a] [-l] [path]"
       )
     ).toBeInTheDocument();
   });

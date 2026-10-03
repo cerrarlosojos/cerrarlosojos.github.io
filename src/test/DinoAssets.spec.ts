@@ -4,7 +4,10 @@ import { Runner } from "../vendor/dino/resources/dino_game/offline.js";
 import sprite2x from "../vendor/dino/images/default_200_percent/200-offline-sprite.png";
 import { recordDinoRun } from "../games/dinoMemory";
 
-vi.mock("../games/dinoMemory", () => ({ recordDinoRun: vi.fn() }));
+vi.mock("../games/dinoMemory", () => ({
+  memoryScoreThreshold: 500,
+  recordDinoRun: vi.fn(),
+}));
 
 vi.mock("../vendor/dino/resources/dino_game/constants.js", () => ({
   IS_HIDPI: true,
@@ -75,12 +78,44 @@ describe("Dinosaur asset loading", () => {
   });
 
   it("records the completed visible score independently from the historical high score", async () => {
+    const endedAt = new Date("2026-10-03T12:34:56+08:00").getTime();
+    vi.spyOn(Date, "now").mockReturnValue(endedAt);
+    const onRunEnd = vi.fn();
     const session = await createDinoRunner(document.createElement("div"), {
       color: "#05CE91",
       signal: new AbortController().signal,
+      onRunEnd,
     });
     vi.mocked(Runner).mock.calls[0][2].onGameOver(14000, 512);
-    expect(recordDinoRun).toHaveBeenCalledWith(512);
+    expect(recordDinoRun).toHaveBeenCalledWith(512, endedAt);
+    expect(onRunEnd).toHaveBeenCalledWith({ score: 512, endedAt });
+    session?.destroy();
+  });
+
+  it("reveals the cue only above 500, retains it at game over, and clears it on restart", async () => {
+    const onMemoryCueChange = vi.fn();
+    const session = await createDinoRunner(document.createElement("div"), {
+      color: "#05CE91",
+      signal: new AbortController().signal,
+      onMemoryCueChange,
+    });
+    const engine = vi.mocked(Runner).mock.calls[0][2];
+    engine.onScoreChange?.(499);
+    engine.onScoreChange?.(500);
+    expect(onMemoryCueChange).not.toHaveBeenCalled();
+    engine.onScoreChange?.(501);
+    engine.onScoreChange?.(520);
+    expect(onMemoryCueChange.mock.calls).toEqual([[true]]);
+    expect(recordDinoRun).not.toHaveBeenCalled();
+
+    engine.onGameOver(1000000, 520);
+    expect(onMemoryCueChange.mock.calls).toEqual([[true]]);
+    expect(recordDinoRun).toHaveBeenCalledWith(520, expect.any(Number));
+    engine.onScoreChange?.(0);
+    engine.onScoreChange?.(500);
+    expect(onMemoryCueChange.mock.calls).toEqual([[true], [false]]);
+    engine.onScoreChange?.(501);
+    expect(onMemoryCueChange.mock.calls).toEqual([[true], [false], [true]]);
     session?.destroy();
   });
 });

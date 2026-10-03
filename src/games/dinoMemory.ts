@@ -4,11 +4,13 @@ import { getFromLS, setToLS } from "../utils/storage";
 const destination = "https://www.bilibili.com/video/BV1PK4y1B76J/";
 const storageKey = "terminal-dino-encrypted-memory";
 const changeEvent = "terminal-memory-change";
+export const memoryScoreThreshold = 500;
 type SealedMemory = {
-  version: 1;
+  version: 1 | 2;
   salt: string;
   iv: string;
   ciphertext: string;
+  modifiedAt?: number;
 };
 let revision = 0;
 // undefined means storage is authoritative; null is an explicit volatile lock.
@@ -33,7 +35,11 @@ export const readSealedMemory = (): SealedMemory | null => {
     const record = JSON.parse(raw);
     if (
       !record ||
-      record.version !== 1 ||
+      (record.version !== 1 && record.version !== 2) ||
+      (record.modifiedAt !== undefined &&
+        (!Number.isSafeInteger(record.modifiedAt) ||
+          record.modifiedAt <= 0 ||
+          !Number.isFinite(new Date(record.modifiedAt).getTime()))) ||
       typeof record.salt !== "string" ||
       typeof record.iv !== "string" ||
       typeof record.ciphertext !== "string" ||
@@ -91,12 +97,16 @@ const deriveKey = async (password: string, salt: Uint8Array) => {
 
 // A completed run replaces the previous key, even when its score is too low.
 // A pending encryption must never overwrite a newer run.
-export const recordDinoRun = async (score: number): Promise<boolean> => {
+export const recordDinoRun = async (
+  score: number,
+  endedAt = Date.now()
+): Promise<boolean> => {
   const run = ++revision;
   writeMemory(null);
-  if (!Number.isSafeInteger(score) || score <= 500) return false;
+  if (!Number.isSafeInteger(score) || score <= memoryScoreThreshold)
+    return false;
   try {
-    const password = String(score % 10000).padStart(4, "0");
+    const password = String(score % 100000).padStart(5, "0");
     const salt = crypto.getRandomValues(new Uint8Array(16));
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const key = await deriveKey(password, salt);
@@ -107,10 +117,11 @@ export const recordDinoRun = async (score: number): Promise<boolean> => {
     );
     if (run !== revision) return false;
     writeMemory({
-      version: 1,
+      version: 2,
       salt: encode(salt),
       iv: encode(iv),
       ciphertext: encode(new Uint8Array(ciphertext)),
+      modifiedAt: endedAt,
     });
     return true;
   } catch {
@@ -119,8 +130,12 @@ export const recordDinoRun = async (score: number): Promise<boolean> => {
 };
 
 export const openMemory = async (password: string, record: SealedMemory) => {
-  if (!/^\d{4}$/.test(password)) throw new Error("Four digits required");
-  const key = await deriveKey(password, decode(record.salt));
+  if (!/^\d{5}$/.test(password)) throw new Error("Five digits required");
+  // Existing memories retain their original four-digit encryption key.
+  const key = await deriveKey(
+    record.version === 1 ? password.slice(-4) : password,
+    decode(record.salt)
+  );
   const plaintext = await crypto.subtle.decrypt(
     { name: "AES-GCM", iv: decode(record.iv) },
     key,

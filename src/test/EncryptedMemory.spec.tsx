@@ -58,12 +58,10 @@ describe("Hidden encrypted file", () => {
     render(<Terminal />);
     command("cat Blog/.dejavu.txt");
     const panel = await screen.findByTestId("encrypted-memory");
-    expect(panel).toHaveTextContent(
-      "The last thing you remember may be the first thing you need."
-    );
-    expect(panel).not.toHaveTextContent(/500|four|digits|score|dino|zeros/i);
+    expect(panel).toHaveTextContent("There is nothing to remember. Yet.");
+    expect(panel).not.toHaveTextContent(/500|five|digits|score|dino|zeros/i);
     const input = screen.getByLabelText("Memory password");
-    fireEvent.change(input, { target: { value: "0512" } });
+    fireEvent.change(input, { target: { value: "00512" } });
     const form = input.closest("form");
     if (!form) throw new Error("Missing password form");
     fireEvent.submit(form);
@@ -81,12 +79,16 @@ describe("Hidden encrypted file", () => {
     command("cat Blog/.dejavu.txt");
     const input = await screen.findByLabelText("Memory password");
     expect(screen.getByTestId("encrypted-memory")).not.toHaveTextContent(
-      /500|four|digits|score|dino|zeros/i
+      /500|five|digits|score|dino|zeros/i
     );
+    expect(screen.getByTestId("encrypted-memory")).toHaveTextContent(
+      "The last thing you remember may be the first thing you need."
+    );
+    expect(input).toHaveAttribute("maxlength", "5");
     await waitFor(() => expect(input).toHaveFocus());
     fireEvent.click(input);
     expect(input).toHaveFocus();
-    fireEvent.change(input, { target: { value: "0513" } });
+    fireEvent.change(input, { target: { value: "00513" } });
     const form = input.closest("form");
     if (!form) throw new Error("Missing password form");
     fireEvent.submit(form);
@@ -96,7 +98,7 @@ describe("Hidden encrypted file", () => {
     expect(
       screen.queryByRole("link", { name: "Open the hidden memory" })
     ).not.toBeInTheDocument();
-    fireEvent.change(input, { target: { value: "0512" } });
+    fireEvent.change(input, { target: { value: "00512" } });
     fireEvent.submit(form);
     const link = await screen.findByRole("link", {
       name: "Open the hidden memory",
@@ -116,6 +118,20 @@ describe("Hidden encrypted file", () => {
     unmount();
   });
 
+  it("updates an open prompt when a qualifying run creates a memory", async () => {
+    render(<Terminal />);
+    command("cat Blog/.dejavu.txt");
+    const panel = await screen.findByTestId("encrypted-memory");
+    expect(panel).toHaveTextContent("There is nothing to remember. Yet.");
+    await act(() => recordDinoRun(500));
+    expect(panel).toHaveTextContent("There is nothing to remember. Yet.");
+    await act(() => recordDinoRun(501));
+    expect(panel).toHaveTextContent(
+      "The last thing you remember may be the first thing you need."
+    );
+    expect(panel).not.toHaveTextContent("There is nothing to remember. Yet.");
+  });
+
   it("relocks an already open file when the next completed run is below the threshold", async () => {
     await recordDinoRun(650);
     render(<Terminal />);
@@ -125,7 +141,10 @@ describe("Hidden encrypted file", () => {
       await recordDinoRun(100);
     });
     const input = screen.getByLabelText("Memory password");
-    fireEvent.change(input, { target: { value: "0650" } });
+    expect(screen.getByTestId("encrypted-memory")).toHaveTextContent(
+      "There is nothing to remember. Yet."
+    );
+    fireEvent.change(input, { target: { value: "00650" } });
     const form = input.closest("form");
     if (!form) throw new Error("Missing password form");
     fireEvent.submit(form);
@@ -140,7 +159,7 @@ describe("Hidden encrypted file", () => {
     render(<Terminal />);
     command("cat Blog/.dejavu.txt");
     const input = await screen.findByLabelText("Memory password");
-    fireEvent.change(input, { target: { value: "0650" } });
+    fireEvent.change(input, { target: { value: "00650" } });
     const form = input.closest("form");
     if (!form) throw new Error("Missing memory form");
     fireEvent.submit(form);

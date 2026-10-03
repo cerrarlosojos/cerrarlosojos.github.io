@@ -3,6 +3,7 @@ export type RunnerOptions = {
   sounds: Record<string, string>;
   highScore: number;
   onGameOver: (highScore: number, score: number) => void;
+  onScoreChange?: (score: number) => void;
 };
 
 export class Runner {

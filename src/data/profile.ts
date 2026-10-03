@@ -28,11 +28,11 @@ export const profile = {
 export const education = [
   {
     title: "Ph.D. student in Computer Science",
-    desc: "Peking University | School of Computer Science | Programming Languages Lab (PLL)",
+    desc: "Peking University | School of Computer Science | Programming Languages Lab (PLL) | 2025–Present",
   },
   {
-    title: "Bachelor's Degree in EECS",
-    desc: "Peking University | 2021–2025",
+    title: "Bachelor's Degree in Computer Science",
+    desc: "Peking University | School of Electronics Engineering and Computer Science | 2021–2025",
   },
 ];
 

@@ -241,6 +241,7 @@ export class Runner {
 
     this.distanceMeter = null;
     this.distanceRan = 0;
+    this.reportedScore = -1;
 
     this.highestScore = 0;
 
@@ -675,6 +676,12 @@ export class Runner {
         deltaTime,
         Math.ceil(this.distanceRan)
       );
+
+      const score = this.distanceMeter.getActualDistance(Math.ceil(this.distanceRan));
+      if (score !== this.reportedScore) {
+        this.reportedScore = score;
+        this.options.onScoreChange?.(score);
+      }
 
       if (!Runner.audioCues && playAchievementSound) {
         this.playSound(this.soundFx.SCORE);

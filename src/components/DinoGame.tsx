@@ -1,18 +1,25 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useTheme } from "styled-components";
-import type { DinoSession } from "../games/createDinoRunner";
+import type { DinoRun, DinoSession } from "../games/createDinoRunner";
 import { HelpPanel, PanelTitle } from "./styles/Help.styled";
-import { GameControls, GameHint, GameViewport } from "./styles/DinoGame.styled";
+import {
+  GameControls,
+  GameHint,
+  GameMemoryCue,
+  GameViewport,
+} from "./styles/DinoGame.styled";
 
-type Props = { onExit: () => void };
+type Props = { onExit: (run: DinoRun | null) => void };
 
 const DinoGame: React.FC<Props> = ({ onExit }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastRun = useRef<DinoRun | null>(null);
   const hintId = useId();
   const theme = useTheme();
   const color = theme?.colors?.primary ?? "#05CE91";
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [memoryCueVisible, setMemoryCueVisible] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -21,11 +28,19 @@ const DinoGame: React.FC<Props> = ({ onExit }) => {
     let session: DinoSession | null = null;
     setLoading(true);
     setError(false);
+    setMemoryCueVisible(false);
     container.focus();
 
     import("../games/createDinoRunner")
       .then(({ createDinoRunner }) =>
-        createDinoRunner(container, { color, signal: controller.signal })
+        createDinoRunner(container, {
+          color,
+          signal: controller.signal,
+          onRunEnd: run => {
+            lastRun.current = run;
+          },
+          onMemoryCueChange: setMemoryCueVisible,
+        })
       )
       .then(createdSession => {
         session = createdSession;
@@ -56,13 +71,13 @@ const DinoGame: React.FC<Props> = ({ onExit }) => {
           if (event.key === "Escape") {
             event.preventDefault();
             event.stopPropagation();
-            onExit();
+            onExit(lastRun.current);
           }
         }}
       >
         <PanelTitle>dino</PanelTitle>
         <GameControls>
-          <button type="button" onClick={onExit}>
+          <button type="button" onClick={() => onExit(lastRun.current)}>
             Exit [Esc]
           </button>
         </GameControls>
@@ -76,6 +91,17 @@ const DinoGame: React.FC<Props> = ({ onExit }) => {
         >
           {loading && <span role="status">Loading…</span>}
           {error && <span role="alert">Unable to load the game.</span>}
+          {memoryCueVisible && (
+            <GameMemoryCue
+              role="img"
+              aria-label="A small black cube"
+              viewBox="0 0 32 36"
+            >
+              <path d="M16 2 30 10 16 18 2 10Z" fill="#171812" />
+              <path d="M2 10 16 18 16 34 2 26Z" fill="#060706" />
+              <path d="M16 18 30 10 30 26 16 34Z" fill="#0b0c09" />
+            </GameMemoryCue>
+          )}
         </GameViewport>
       </HelpPanel>
       <GameHint id={hintId}>

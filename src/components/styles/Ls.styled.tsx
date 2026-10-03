@@ -1,4 +1,42 @@
 import styled from "styled-components";
+import { HelpPanel } from "./Help.styled";
+
+export const DetailedListingPanel = styled(HelpPanel)`
+  max-width: 68rem;
+`;
+
+export const LongDirectoryListing = styled.div`
+  max-width: 100%;
+  overflow-x: auto;
+
+  table {
+    border-collapse: collapse;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    color: ${({ theme }) => theme.colors?.text[200]};
+  }
+
+  td {
+    padding: 0.2rem 1.5ch 0.2rem 0;
+  }
+
+  td:last-child {
+    padding-right: 0;
+  }
+
+  .numeric {
+    text-align: right;
+  }
+
+  .name {
+    color: ${({ theme }) => theme.colors?.primary};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${({ theme }) => theme.colors?.primary};
+    outline-offset: 4px;
+  }
+`;
 
 export const DirectoryListing = styled.dl<{ $files: boolean }>`
   display: grid;

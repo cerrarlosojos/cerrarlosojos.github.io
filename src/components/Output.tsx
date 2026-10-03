@@ -8,6 +8,7 @@ import Welcome from "./commands/Welcome";
 import Ls from "./commands/Ls";
 import Projects from "./commands/Projects";
 import Socials from "./commands/Socials";
+import Teaching from "./commands/Teaching";
 import Themes from "./commands/Themes";
 import { CommandName, findCommand } from "../data/commands";
 import { OutputContainer, UsageDiv } from "./styles/Output.styled";
@@ -45,6 +46,7 @@ const Output: React.FC<Props> = ({ index, cmd }) => {
           projects: <Projects />,
           pwd: <GeneralOutput>{directory}</GeneralOutput>,
           socials: <Socials />,
+          teaching: <Teaching />,
           themes: <Themes />,
           welcome: <Welcome />,
           whoami: <GeneralOutput>visitor</GeneralOutput>,

@@ -51,7 +51,7 @@ const EncryptedMemory: React.FC<{ path: string; autoFocus: boolean }> = ({
   const unlock = async (event: React.FormEvent) => {
     event.preventDefault();
     if (busy) return;
-    if (!record || !/^\d{4}$/.test(password)) {
+    if (!record || !/^\d{5}$/.test(password)) {
       setMessage("That memory doesn't belong here.");
       setPassword("");
       return;
@@ -80,7 +80,9 @@ const EncryptedMemory: React.FC<{ path: string; autoFocus: boolean }> = ({
       {!url && (
         <>
           <MemoryHint>
-            The last thing you remember may be the first thing you need.
+            {record
+              ? "The last thing you remember may be the first thing you need."
+              : "There is nothing to remember. Yet."}
           </MemoryHint>
           <LockForm onSubmit={unlock} noValidate>
             <label htmlFor={passwordId}>Key</label>
@@ -91,8 +93,8 @@ const EncryptedMemory: React.FC<{ path: string; autoFocus: boolean }> = ({
               type="password"
               inputMode="numeric"
               autoComplete="off"
-              maxLength={4}
-              pattern="[0-9]{4}"
+              maxLength={5}
+              pattern="[0-9]{5}"
               required
               disabled={busy}
               value={password}

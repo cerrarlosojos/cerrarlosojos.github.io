@@ -1,4 +1,28 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const revealMemory = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+export const GameMemoryCue = styled.svg`
+  position: absolute;
+  top: 1.75rem;
+  right: 0.65rem;
+  z-index: 1;
+  width: 1.75rem;
+  height: 2rem;
+  pointer-events: none;
+  stroke: #777c6b;
+  stroke-width: 0.65;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 3px #0004);
+  animation: ${revealMemory} 450ms ease-out both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+`;
 
 export const GameControls = styled.div`
   display: flex;

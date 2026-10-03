@@ -8,6 +8,9 @@ import React, {
 import Output from "./Output";
 import TermInfo from "./TermInfo";
 import DinoGame from "./DinoGame";
+import type { DinoRun } from "../games/createDinoRunner";
+import { formatTimestamp } from "../utils/date";
+import { GameHint } from "./styles/DinoGame.styled";
 import {
   CmdNotFound,
   Empty,
@@ -38,6 +41,7 @@ type CommandEntry = ReturnType<typeof parseCommand> & {
   directory: string;
   error?: string;
   game?: "dino";
+  gameRun?: DinoRun;
 };
 
 const Terminal = () => {
@@ -58,7 +62,19 @@ const Terminal = () => {
   const [hints, setHints] = useState<string[]>([]);
   const [pointer, setPointer] = useState(-1);
   const [activeGameId, setActiveGameId] = useState<number | null>(null);
-  const exitGame = useCallback(() => setActiveGameId(null), []);
+  const exitGame = useCallback(
+    (run: DinoRun | null) => {
+      if (run) {
+        setEntries(previous =>
+          previous.map(entry =>
+            entry.id === activeGameId ? { ...entry, gameRun: run } : entry
+          )
+        );
+      }
+      setActiveGameId(null);
+    },
+    [activeGameId]
+  );
 
   const clearHistory = () => {
     setEntries([]);
@@ -188,7 +204,10 @@ const Terminal = () => {
         />
       </Form>
       {entries.map(
-        ({ id, command, name, args, directory, error, game }, index) => (
+        (
+          { id, command, name, args, directory, error, game, gameRun },
+          index
+        ) => (
           <div key={id}>
             <div>
               <TermInfo directory={directory} />
@@ -202,6 +221,16 @@ const Terminal = () => {
               ) : activeGameId === id ? (
                 <div data-testid={index === 0 ? "latest-output" : undefined}>
                   <DinoGame onExit={exitGame} />
+                </div>
+              ) : gameRun ? (
+                <div data-testid={index === 0 ? "latest-output" : undefined}>
+                  <GameHint data-testid="dino-run-summary">
+                    dino ended · score {String(gameRun.score).padStart(5, "0")}{" "}
+                    ·{" "}
+                    <time dateTime={new Date(gameRun.endedAt).toISOString()}>
+                      {formatTimestamp(gameRun.endedAt)}
+                    </time>
+                  </GameHint>
                 </div>
               ) : null
             ) : findCommand(name) ? (

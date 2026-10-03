@@ -59,12 +59,17 @@ describe("Embedded engine isolation and cleanup", () => {
     vi.unstubAllGlobals();
   });
 
-  const start = (highScore = 0, onGameOver = vi.fn()) => {
+  const start = (
+    highScore = 0,
+    onGameOver = vi.fn(),
+    onScoreChange = vi.fn()
+  ) => {
     runner = new Runner(host, undefined, {
       sprite: new Image(),
       sounds: {},
       highScore,
       onGameOver,
+      onScoreChange,
     });
     return runner;
   };
@@ -160,5 +165,30 @@ describe("Embedded engine isolation and cleanup", () => {
     game.gameOver();
     expect(completed).toHaveBeenLastCalledWith(1000000, visibleScore);
     expect(visibleScore).toBeGreaterThan(500);
+  });
+
+  it("reports live score changes and zero on restart without resetting at game over", () => {
+    const progress = vi.fn();
+    const game = start(1000000, vi.fn(), progress) as Runner & {
+      playing: boolean;
+      activated: boolean;
+      distanceRan: number;
+      update: () => void;
+      gameOver: () => void;
+      restart: () => void;
+    };
+    game.playing = true;
+    game.activated = true;
+    game.distanceRan = 20000;
+    game.update();
+    expect(progress).toHaveBeenLastCalledWith(500);
+    game.distanceRan = 20040;
+    game.update();
+    game.update();
+    expect(progress.mock.calls).toEqual([[500], [501]]);
+    game.gameOver();
+    expect(progress).toHaveBeenLastCalledWith(501);
+    game.restart();
+    expect(progress).toHaveBeenLastCalledWith(0);
   });
 });

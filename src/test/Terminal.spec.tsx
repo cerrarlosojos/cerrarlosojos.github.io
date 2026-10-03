@@ -106,6 +106,7 @@ describe("Terminal Component", () => {
       "ls",
       "projects",
       "socials",
+      "teaching",
       "themes",
     ];
     otherCmds.forEach(cmd => {
@@ -165,7 +166,7 @@ describe("Terminal Component", () => {
       async path => {
         await user.type(terminalInput, `ls ${path}{enter}`);
         expect(screen.getByTestId("ls-invalid-arg")).toHaveTextContent(
-          `ls: cannot access '${path}': No such directory`
+          `ls: cannot access '${path}': No such file or directory`
         );
       }
     );
@@ -175,7 +176,7 @@ describe("Terminal Component", () => {
       async path => {
         await user.type(terminalInput, `ls ${path}{enter}`);
         expect(screen.getByTestId("ls-invalid-arg")).toHaveTextContent(
-          `ls: cannot access '${path}': No such directory`
+          `ls: cannot access '${path}': No such file or directory`
         );
       }
     );
@@ -183,7 +184,7 @@ describe("Terminal Component", () => {
     it("shows usage when more than one directory is supplied", async () => {
       await user.type(terminalInput, "ls Publications Blog{enter}");
       expect(screen.getByTestId("ls-invalid-arg")).toHaveTextContent(
-        "Usage: ls [-a] [directory]"
+        "Usage: ls [-a] [-l] [path]"
       );
     });
 

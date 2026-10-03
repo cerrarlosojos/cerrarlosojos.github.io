@@ -10,13 +10,19 @@
 | `education` | Ph.D. studies and bachelor's degree at Peking University |
 | `glow <file.md> [file ...]` | Previews Markdown files in the terminal |
 | `help` | Lists available commands by group |
-| `ls [-a] [directory]` | Lists virtual directories and files |
+| `ls [-a] [-l] [path]` | Lists virtual directories and files; `-a` includes hidden entries and `-l` shows metadata. Pass flags separately, as in `ls -a -l`. |
 | `projects` | Research project descriptions with PDF and BibTeX links |
 | `pwd` | Prints the current absolute virtual directory path |
 | `socials` | GitHub, email, and publication links |
+| `teaching` | Teaching assistant experience with a link to the course |
 | `themes [set <theme-name>]` | Lists available themes or switches to the selected theme |
 | `welcome` | Welcome banner, profile, research interests, lambda cube, and tennis silhouette |
 | `whoami` | Displays `visitor` |
+
+Long listings show metadata for the virtual entries. Unavailable sizes and
+modification times appear as `—`; remote files are not downloaded to inspect
+their metadata. Newly recorded encrypted memories retain their modification
+time across reloads. Historical listings keep the values from when `ls` ran.
 
 ## Template credit
 

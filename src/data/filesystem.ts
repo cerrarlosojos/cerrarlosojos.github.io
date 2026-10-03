@@ -16,7 +16,7 @@ type Directory = {
   description: string;
   children: Entry[];
 };
-type Entry = File | Directory;
+export type Entry = File | Directory;
 
 export const homeDirectory = `/home/${profile.username}`;
 
